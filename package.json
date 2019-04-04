@@ -69,7 +69,6 @@
         "uuid": "^3.3.2"
     },
     "scripts": {
-        "prepare": "tsc",
         "lint": "tslint --project ./",
         "test": "nyc mocha",
         "test-integration": "nyc mocha --opts ./vagrant/mocha.opts",
