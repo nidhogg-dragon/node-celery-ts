@@ -137,6 +137,7 @@ export class Task<T> {
         kwargs,
         priority = 0,
         queue = this.queue,
+        id,
         serializer = Packer.Serializer.Json,
     }: TaskApplyOptions): Result<T> {
         const backend = (() => {
@@ -146,8 +147,9 @@ export class Task<T> {
 
             return this.backend;
         })();
-
-        const id = Uuid.v4();
+        if (!id || id === '') {
+           id = Uuid.v4();
+        }
         const result = new Result<T>(id, backend);
 
         const [packer, encoding] = Task.createPacker(serializer, compression);
@@ -456,6 +458,7 @@ export interface TaskApplyOptions {
     kwargs: KeywordArgs;
     priority?: Priority;
     queue?: string;
+    id?: string;
     serializer?: Packer.Serializer;
 }
 
