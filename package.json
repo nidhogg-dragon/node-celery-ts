@@ -55,7 +55,7 @@
         "tslint-eslint-rules": "^5.4.0",
         "tslint-sonarts": "^1.7.0",
         "typedoc": "TypeStrong/typedoc#master",
-        "typescript": "^3.0.1"
+        "typescript": "^3.4.1"
     },
     "engines": {
         "node": "^8.11.3"
@@ -69,6 +69,7 @@
         "uuid": "^3.3.2"
     },
     "scripts": {
+        "prepare": "tsc",
         "lint": "tslint --project ./",
         "test": "nyc mocha",
         "test-integration": "nyc mocha --opts ./vagrant/mocha.opts",
