@@ -69,11 +69,11 @@
         "uuid": "^3.3.2"
     },
     "scripts": {
-        "prepare": "./node_modules/typescript/bin/tsc",
-        "lint": "./node_modules/tslint/bin/tslint --project ./",
+        "prepare": "tsc",
+        "lint": "tslint --project ./",
         "test": "nyc mocha",
         "test-integration": "nyc mocha --opts ./vagrant/mocha.opts",
-        "typedoc": "./node_modules/typedoc/bin/typedoc ./src/"
+        "typedoc": "typedoc ./src/"
     },
     "nyc": {
         "extension": [
