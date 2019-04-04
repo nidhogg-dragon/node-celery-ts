@@ -31,6 +31,7 @@
 
 export { AmqpBroker, AmqpOptions, RpcBackend } from "./amqp";
 export { Client } from "./client";
+export { PromiseMap, PromiseQueue, ResourcePool } from "./containers";
 export * from "./errors";
 export * from "./factories";
 export * from "./message_broker";
