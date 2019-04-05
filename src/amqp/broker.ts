@@ -169,7 +169,7 @@ export class AmqpBroker implements MessageBroker {
         exchange: string;
         routingKey: string;
     }): Promise<void> {
-        const assertion = channel.assertQueue(routingKey);
+        const assertion = channel.assertQueue(routingKey, { maxPriority: 10 });
 
         // cannot assert default exchange
         if (exchange === "") {
