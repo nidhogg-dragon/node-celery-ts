@@ -151,7 +151,7 @@ export class Task<T> {
            id = Uuid.v4();
         }
         let result = null;
-        if (ignoreResult) {
+        if (!ignoreResult) {
             result = new Result<T>(id, backend);
             console.log(result);
         }
