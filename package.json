@@ -69,7 +69,6 @@
         "uuid": "^3.3.2"
     },
     "scripts": {
-        "prepare": "npm run build",
         "lint": "tslint --project ./",
         "build": "tsc",
         "test": "nyc mocha",
