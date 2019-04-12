@@ -92,9 +92,9 @@ class RpcBackend {
     assertQueue(channel) {
         return __awaiter(this, void 0, void 0, function* () {
             return channel.assertQueue(this.routingKey, {
-                autoDelete: false,
+                autoDelete: true,
                 durable: false,
-                expires: 86400000,
+                expires: 7200000,
             });
         });
     }

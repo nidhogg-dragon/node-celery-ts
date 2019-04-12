@@ -229,9 +229,9 @@ export class RpcBackend implements ResultBackend {
         channel: AmqpLib.Channel
     ): Promise<AmqpLib.Replies.AssertQueue> {
         return channel.assertQueue(this.routingKey, {
-            autoDelete: false,
+            autoDelete: true,
             durable: false,
-            expires: 86400000, // 1 day in ms
+            expires: 7200000, // 2h in ms
         });
     }
 
