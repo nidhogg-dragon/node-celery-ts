@@ -28,7 +28,7 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 
-import { AmqpOptions, DEFAULT_AMQP_OPTIONS } from "./options";
+import * as AmqpLib from "amqplib";
 
 import { PromiseMap, ResourcePool } from "../containers";
 import { UnimplementedError } from "../errors";
@@ -40,7 +40,7 @@ import {
     promisifyEvent,
 } from "../utility";
 
-import * as AmqpLib from "amqplib";
+import { AmqpOptions, DEFAULT_AMQP_OPTIONS } from "./options";
 
 /**
  * RabbitMQ result backend using RPC and one queue per client.
@@ -51,7 +51,7 @@ export class RpcBackend implements ResultBackend {
     private readonly consumer: Promise<AmqpLib.Channel>;
     private readonly consumerTag: Promise<string>;
     private readonly options: AmqpOptions;
-    private promises: PromiseMap<string, Message>;
+    private readonly promises: PromiseMap<string, Message>;
     private readonly routingKey: string;
 
     /**

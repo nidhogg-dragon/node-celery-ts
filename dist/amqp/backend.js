@@ -8,11 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const options_1 = require("./options");
+const AmqpLib = require("amqplib");
 const containers_1 = require("../containers");
 const errors_1 = require("../errors");
 const utility_1 = require("../utility");
-const AmqpLib = require("amqplib");
+const options_1 = require("./options");
 class RpcBackend {
     constructor(routingKey, options) {
         const DEFAULT_TIMEOUT = 86400000;

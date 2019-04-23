@@ -139,7 +139,7 @@ export class Task<T> {
         queue = this.queue,
         id,
         serializer = Packer.Serializer.Json,
-    }: TaskApplyOptions): Result<T> | {[key:string]:any} {
+    }: TaskApplyOptions): Result<T> {
         const backend = (() => {
             if (ignoreResult) {
                 return new NullBackend();
@@ -150,11 +150,7 @@ export class Task<T> {
         if (!id || id === '') {
            id = Uuid.v4();
         }
-        let result = null;
-        if (!ignoreResult) {
-            result = new Result<T>(id, backend);
-            console.log(result);
-        }
+        const result = new Result<T>(id, backend);
         const [packer, encoding] = Task.createPacker(serializer, compression);
         const body = Task.packBody({ args, kwargs, packer });
 
@@ -194,9 +190,7 @@ export class Task<T> {
 
         tryPublish();
 
-        return {
-            taskId: id
-        };
+        return result;
     }
 
     /**

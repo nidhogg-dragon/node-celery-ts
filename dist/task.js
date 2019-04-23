@@ -44,11 +44,7 @@ class Task {
         if (!id || id === '') {
             id = Uuid.v4();
         }
-        let result = null;
-        if (!ignoreResult) {
-            result = new result_1.Result(id, backend);
-            console.log(result);
-        }
+        const result = new result_1.Result(id, backend);
         const [packer, encoding] = Task.createPacker(serializer, compression);
         const body = Task.packBody({ args, kwargs, packer });
         const etaStr = Task.dateOrNull(eta);
@@ -83,9 +79,7 @@ class Task {
             }
         });
         tryPublish();
-        return {
-            taskId: id
-        };
+        return result;
     }
     static dateOrNull(date) {
         if (utility_1.isNullOrUndefined(date)) {

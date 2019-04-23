@@ -1,13 +1,13 @@
-import { AmqpOptions } from "./options";
 import { ResultMessage } from "../messages";
 import { GetOptions, ResultBackend } from "../result_backend";
+import { AmqpOptions } from "./options";
 export declare class RpcBackend implements ResultBackend {
     private readonly channels;
     private readonly connection;
     private readonly consumer;
     private readonly consumerTag;
     private readonly options;
-    private promises;
+    private readonly promises;
     private readonly routingKey;
     constructor(routingKey: string, options?: AmqpOptions);
     put<T>(message: ResultMessage<T>): Promise<string>;

@@ -14,9 +14,7 @@ export declare class Task<T> {
     private readonly queue;
     private readonly timeLimit;
     constructor({ appId, backend, brokers, deliveryMode, failoverStrategy, hardTimeLimit, name, queue, softTimeLimit, }: TaskOptions);
-    applyAsync({ args, compression, eta, expires, ignoreResult, kwargs, priority, queue, id, serializer, }: TaskApplyOptions): Result<T> | {
-        [key: string]: any;
-    };
+    applyAsync({ args, compression, eta, expires, ignoreResult, kwargs, priority, queue, id, serializer, }: TaskApplyOptions): Result<T>;
     private static dateOrNull;
     private static getTimeLimit;
     private getDeliveryMode;
