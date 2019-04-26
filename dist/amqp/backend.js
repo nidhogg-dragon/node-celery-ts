@@ -15,7 +15,7 @@ const utility_1 = require("../utility");
 const options_1 = require("./options");
 class RpcBackend {
     constructor(routingKey, options) {
-        const DEFAULT_TIMEOUT = 86400000;
+        const DEFAULT_TIMEOUT = 7200000;
         this.options = (() => {
             if (utility_1.isNullOrUndefined(options)) {
                 return options_1.DEFAULT_AMQP_OPTIONS;

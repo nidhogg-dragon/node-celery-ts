@@ -63,7 +63,7 @@ export class RpcBackend implements ResultBackend {
      *                `undefined`, will connect to localhost:6379.
      */
     public constructor(routingKey: string, options?: AmqpOptions) {
-        const DEFAULT_TIMEOUT: number = 86400000; // 1 year in milliseconds
+        const DEFAULT_TIMEOUT: number = 7200000; // 2 hours in milliseconds
 
         this.options = (() => {
             if (isNullOrUndefined(options)) {
