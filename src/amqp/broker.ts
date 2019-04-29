@@ -65,16 +65,21 @@ export class AmqpBroker implements MessageBroker {
 
         this.connection = Promise.resolve(AmqpLib.connect(this.options));
 
+        this.connection.catch((error) => {
+            // tslint:disable-next-line: no-console
+            console.log("connection init error", error);
+        });
+
         this.channels = new ResourcePool(
             async () => {
                 const connection = await this.connection;
 
                 connection.on("close", (error) => {
-                    console.log('connection close', error);
+                    console.log("connection close", error);
                 });
 
                 connection.on("error", (error) => {
-                    console.log('connection error', error);
+                    console.log("connection error", error);
                 });
 
                 return connection.createChannel();
