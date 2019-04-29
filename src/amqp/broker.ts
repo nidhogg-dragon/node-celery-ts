@@ -69,8 +69,8 @@ export class AmqpBroker implements MessageBroker {
             async () => {
                 const connection = await this.connection;
 
-                connection.on("close", () => {
-                    console.log('connection close');
+                connection.on("close", (error) => {
+                    console.log('connection close', error);
                 });
 
                 connection.on("error", (error) => {

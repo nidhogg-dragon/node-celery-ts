@@ -119,6 +119,7 @@ export class ResourcePool<T> {
      */
     public async get(): Promise<T> {
         const resource = await this.getResource();
+
         this.inUse.add(resource);
 
         return resource;

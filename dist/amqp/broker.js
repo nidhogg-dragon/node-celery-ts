@@ -23,8 +23,8 @@ class AmqpBroker {
         this.connection = Promise.resolve(AmqpLib.connect(this.options));
         this.channels = new containers_1.ResourcePool(() => __awaiter(this, void 0, void 0, function* () {
             const connection = yield this.connection;
-            connection.on("close", () => {
-                console.log('connection close');
+            connection.on("close", (error) => {
+                console.log('connection close', error);
             });
             connection.on("error", (error) => {
                 console.log('connection error', error);
