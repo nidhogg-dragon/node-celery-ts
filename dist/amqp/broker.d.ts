@@ -1,8 +1,8 @@
-import { AmqpOptions } from "./options";
 import { MessageBroker } from "../message_broker";
 import { TaskMessage } from "../messages";
+import { AmqpOptions } from "./options";
 export declare class AmqpBroker implements MessageBroker {
-    private channels;
+    private readonly channels;
     private readonly connection;
     private readonly options;
     constructor(options?: AmqpOptions);

@@ -29,21 +29,21 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-import { AmqpOptions, DEFAULT_AMQP_OPTIONS } from "./options";
+import * as AmqpLib from "amqplib";
 
 import { ResourcePool } from "../containers";
 import { MessageBroker } from "../message_broker";
 import { TaskMessage } from "../messages";
 import { isNullOrUndefined, promisifyEvent } from "../utility";
 
-import * as AmqpLib from "amqplib";
+import { AmqpOptions, DEFAULT_AMQP_OPTIONS } from "./options";
 
 /**
  * `AmqpBroker` implements `MessageBroker` using the `RabbitMQ` message broker.
  * Messages are, by default, durable, and will survive a broker restart.
  */
 export class AmqpBroker implements MessageBroker {
-    private channels: ResourcePool<AmqpLib.Channel>;
+    private readonly channels: ResourcePool<AmqpLib.Channel>;
     private readonly connection: Promise<AmqpLib.Connection>;
     private readonly options: AmqpOptions;
 
@@ -68,6 +68,14 @@ export class AmqpBroker implements MessageBroker {
         this.channels = new ResourcePool(
             async () => {
                 const connection = await this.connection;
+
+                connection.on("close", () => {
+                    console.log('connection close');
+                });
+
+                connection.on("error", (error) => {
+                    console.log('connection error', error);
+                });
 
                 return connection.createChannel();
             },
