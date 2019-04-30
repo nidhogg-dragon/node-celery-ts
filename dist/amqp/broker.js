@@ -76,6 +76,9 @@ class AmqpBroker {
                 });
             }).catch((error) => {
                 console.log("connection init error", error);
+                if (!this.reconnecting) {
+                    this.reconnect();
+                }
             });
             this.channels = new containers_1.ResourcePool(() => __awaiter(this, void 0, void 0, function* () {
                 const connection = yield this.connection;

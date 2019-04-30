@@ -145,6 +145,9 @@ export class AmqpBroker implements MessageBroker {
         }).catch((error) => {
             // tslint:disable-next-line: no-console
             console.log("connection init error", error);
+            if (!this.reconnecting) {
+                this.reconnect();
+            }
         });
 
         this.channels = new ResourcePool(
@@ -161,7 +164,6 @@ export class AmqpBroker implements MessageBroker {
         );
         this.reconnecting = false;
     }
-
 
     /**
      * Queues a message onto the requested exchange.
