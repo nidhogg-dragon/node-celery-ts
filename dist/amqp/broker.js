@@ -33,8 +33,18 @@ class AmqpBroker {
         });
         this.channels = new containers_1.ResourcePool(() => __awaiter(this, void 0, void 0, function* () {
             const connection = yield this.connection;
-            console.log('111111');
-            return connection.createChannel();
+            const channelPromise = connection.createChannel();
+            channelPromise.then((ch) => {
+                ch.on("close", (error) => {
+                    console.log("channel close", error);
+                });
+                ch.on("error", (error) => {
+                    console.log("channel error", error);
+                });
+            }).catch((error) => {
+                console.log("channel init error", error);
+            });
+            return channelPromise;
         }), (channel) => __awaiter(this, void 0, void 0, function* () {
             yield channel.close();
             return "closed";
