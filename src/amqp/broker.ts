@@ -43,9 +43,10 @@ import { AmqpOptions, DEFAULT_AMQP_OPTIONS } from "./options";
  * Messages are, by default, durable, and will survive a broker restart.
  */
 export class AmqpBroker implements MessageBroker {
-    private readonly channels: ResourcePool<AmqpLib.Channel>;
-    private readonly connection: Promise<AmqpLib.Connection>;
+    private channels: ResourcePool<AmqpLib.Channel>;
+    private connection: Promise<AmqpLib.Connection>;
     private readonly options: AmqpOptions;
+    private reconnecting: boolean = false;
 
     /**
      * Constructs an `AmqpBroker` with the given options.
@@ -66,12 +67,15 @@ export class AmqpBroker implements MessageBroker {
         this.connection = Promise.resolve(AmqpLib.connect(this.options));
 
         this.connection.then((conn) => {
-            conn.on("close", (error) => {
+            conn.on("close", async (error) => {
                 console.log("connection close", error);
             });
 
-            conn.on("error", (error) => {
+            conn.on("error", async (error) => {
                 console.log("connection error", error);
+                if (!this.reconnecting) {
+                    this.reconnect();
+                }
             });
 
         }).catch((error) => {
@@ -82,21 +86,7 @@ export class AmqpBroker implements MessageBroker {
         this.channels = new ResourcePool(
             async () => {
                 const connection = await this.connection;
-                const channelPromise = connection.createChannel();
-                channelPromise.then((ch) => {
-                    ch.on("close", (error) => {
-                        console.log("channel close", error);
-                    });
-
-                    ch.on("error", (error) => {
-                        console.log("channel error", error);
-                    });
-
-                }).catch((error) => {
-                    // tslint:disable-next-line: no-console
-                    console.log("channel init error", error);
-                });
-                return channelPromise;
+                return connection.createChannel();
             },
             async (channel) => {
                 await channel.close();
@@ -130,6 +120,49 @@ export class AmqpBroker implements MessageBroker {
         const connection = await this.connection;
         await connection.close();
     }
+
+    public async reconnect(): Promise<void> {
+        this.reconnecting = true;
+        await this.end();
+        await new Promise((resolve)=> {
+            setTimeout(()=>{
+                resolve(true);
+            }, 5000);
+        });
+        this.connection = Promise.resolve(AmqpLib.connect(this.options));
+
+        this.connection.then((conn) => {
+            conn.on("close", async (error) => {
+                console.log("connection close", error);
+            });
+
+            conn.on("error", (error) => {
+                console.log("connection error", error);
+                if (!this.reconnecting) {
+                    this.reconnect();
+                }
+            });
+
+        }).catch((error) => {
+            // tslint:disable-next-line: no-console
+            console.log("connection init error", error);
+        });
+
+        this.channels = new ResourcePool(
+            async () => {
+                const connection = await this.connection;
+                return connection.createChannel();
+            },
+            async (channel) => {
+                await channel.close();
+
+                return "closed";
+            },
+            2,
+        );
+        this.reconnecting = false;
+    }
+
 
     /**
      * Queues a message onto the requested exchange.

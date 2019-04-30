@@ -14,6 +14,7 @@ const utility_1 = require("../utility");
 const options_1 = require("./options");
 class AmqpBroker {
     constructor(options) {
+        this.reconnecting = false;
         this.options = (() => {
             if (utility_1.isNullOrUndefined(options)) {
                 return options_1.DEFAULT_AMQP_OPTIONS;
@@ -22,29 +23,21 @@ class AmqpBroker {
         })();
         this.connection = Promise.resolve(AmqpLib.connect(this.options));
         this.connection.then((conn) => {
-            conn.on("close", (error) => {
+            conn.on("close", (error) => __awaiter(this, void 0, void 0, function* () {
                 console.log("connection close", error);
-            });
-            conn.on("error", (error) => {
+            }));
+            conn.on("error", (error) => __awaiter(this, void 0, void 0, function* () {
                 console.log("connection error", error);
-            });
+                if (!this.reconnecting) {
+                    this.reconnect();
+                }
+            }));
         }).catch((error) => {
             console.log("connection init error", error);
         });
         this.channels = new containers_1.ResourcePool(() => __awaiter(this, void 0, void 0, function* () {
             const connection = yield this.connection;
-            const channelPromise = connection.createChannel();
-            channelPromise.then((ch) => {
-                ch.on("close", (error) => {
-                    console.log("channel close", error);
-                });
-                ch.on("error", (error) => {
-                    console.log("channel error", error);
-                });
-            }).catch((error) => {
-                console.log("channel init error", error);
-            });
-            return channelPromise;
+            return connection.createChannel();
         }), (channel) => __awaiter(this, void 0, void 0, function* () {
             yield channel.close();
             return "closed";
@@ -60,6 +53,39 @@ class AmqpBroker {
             yield this.channels.destroyAll();
             const connection = yield this.connection;
             yield connection.close();
+        });
+    }
+    reconnect() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.reconnecting = true;
+            yield this.end();
+            yield new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(true);
+                }, 5000);
+            });
+            this.connection = Promise.resolve(AmqpLib.connect(this.options));
+            this.connection.then((conn) => {
+                conn.on("close", (error) => __awaiter(this, void 0, void 0, function* () {
+                    console.log("connection close", error);
+                }));
+                conn.on("error", (error) => {
+                    console.log("connection error", error);
+                    if (!this.reconnecting) {
+                        this.reconnect();
+                    }
+                });
+            }).catch((error) => {
+                console.log("connection init error", error);
+            });
+            this.channels = new containers_1.ResourcePool(() => __awaiter(this, void 0, void 0, function* () {
+                const connection = yield this.connection;
+                return connection.createChannel();
+            }), (channel) => __awaiter(this, void 0, void 0, function* () {
+                yield channel.close();
+                return "closed";
+            }), 2);
+            this.reconnecting = false;
         });
     }
     publish(message) {
