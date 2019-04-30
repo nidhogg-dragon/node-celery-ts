@@ -21,17 +21,19 @@ class AmqpBroker {
             return options;
         })();
         this.connection = Promise.resolve(AmqpLib.connect(this.options));
-        this.connection.catch((error) => {
+        this.connection.then((conn) => {
+            conn.on("close", (error) => {
+                console.log("connection close", error);
+            });
+            conn.on("error", (error) => {
+                console.log("connection error", error);
+            });
+        }).catch((error) => {
             console.log("connection init error", error);
         });
         this.channels = new containers_1.ResourcePool(() => __awaiter(this, void 0, void 0, function* () {
             const connection = yield this.connection;
-            connection.on("close", (error) => {
-                console.log("connection close", error);
-            });
-            connection.on("error", (error) => {
-                console.log("connection error", error);
-            });
+            console.log('111111');
             return connection.createChannel();
         }), (channel) => __awaiter(this, void 0, void 0, function* () {
             yield channel.close();
