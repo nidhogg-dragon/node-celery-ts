@@ -123,7 +123,6 @@ export class AmqpBroker implements MessageBroker {
 
     public async reconnect(): Promise<void> {
         this.reconnecting = true;
-        await this.end();
         await new Promise((resolve)=> {
             setTimeout(()=>{
                 resolve(true);

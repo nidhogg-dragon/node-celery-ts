@@ -58,7 +58,6 @@ class AmqpBroker {
     reconnect() {
         return __awaiter(this, void 0, void 0, function* () {
             this.reconnecting = true;
-            yield this.end();
             yield new Promise((resolve) => {
                 setTimeout(() => {
                     resolve(true);
