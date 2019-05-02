@@ -64,7 +64,15 @@ class AmqpBroker {
                 }, 5000);
             });
             this.connection = Promise.resolve(AmqpLib.connect(this.options));
-            this.connection.then((conn) => {
+            let conn;
+            try {
+                conn = yield this.connection;
+            }
+            catch (err) {
+                console.log("connection init error", err);
+                this.reconnect();
+            }
+            if (conn) {
                 conn.on("close", (error) => __awaiter(this, void 0, void 0, function* () {
                     console.log("connection close", error);
                 }));
@@ -74,20 +82,15 @@ class AmqpBroker {
                         this.reconnect();
                     }
                 });
-            }).catch((error) => {
-                console.log("connection init error", error);
-                if (!this.reconnecting) {
-                    this.reconnect();
-                }
-            });
-            this.channels = new containers_1.ResourcePool(() => __awaiter(this, void 0, void 0, function* () {
-                const connection = yield this.connection;
-                return connection.createChannel();
-            }), (channel) => __awaiter(this, void 0, void 0, function* () {
-                yield channel.close();
-                return "closed";
-            }), 2);
-            this.reconnecting = false;
+                this.channels = new containers_1.ResourcePool(() => __awaiter(this, void 0, void 0, function* () {
+                    const connection = yield this.connection;
+                    return connection.createChannel();
+                }), (channel) => __awaiter(this, void 0, void 0, function* () {
+                    yield channel.close();
+                    return "closed";
+                }), 2);
+                this.reconnecting = false;
+            }
         });
     }
     publish(message) {

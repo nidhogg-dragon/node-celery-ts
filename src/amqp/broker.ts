@@ -129,8 +129,15 @@ export class AmqpBroker implements MessageBroker {
             }, 5000);
         });
         this.connection = Promise.resolve(AmqpLib.connect(this.options));
+        let conn;
+        try {
+            conn = await this.connection;
+        } catch (err) {
+            console.log("connection init error", err);
+            this.reconnect();
+        }
 
-        this.connection.then((conn) => {
+        if (conn) {
             conn.on("close", async (error) => {
                 console.log("connection close", error);
             });
@@ -142,27 +149,20 @@ export class AmqpBroker implements MessageBroker {
                 }
             });
 
-        }).catch((error) => {
-            // tslint:disable-next-line: no-console
-            console.log("connection init error", error);
-            if (!this.reconnecting) {
-                this.reconnect();
-            }
-        });
-
-        this.channels = new ResourcePool(
-            async () => {
-                const connection = await this.connection;
-                return connection.createChannel();
-            },
-            async (channel) => {
-                await channel.close();
-
-                return "closed";
-            },
-            2,
-        );
-        this.reconnecting = false;
+            this.channels = new ResourcePool(
+                async () => {
+                    const connection = await this.connection;
+                    return connection.createChannel();
+                },
+                async (channel) => {
+                    await channel.close();
+    
+                    return "closed";
+                },
+                2,
+            );
+            this.reconnecting = false;
+        }
     }
 
     /**
